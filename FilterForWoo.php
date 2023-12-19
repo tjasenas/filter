@@ -1,20 +1,14 @@
 <?php
 
 
-
-
-
-
 function filtered_products($request) {
 
     $body = json_decode($request->get_body());
     $tags = [];
-    $ggg = [];
 
     foreach( $body->tags as $tag) {
         array_push($tags, $tag->tag);
     }
-
 
     $args = array(
         'post_status' => 'publish',
@@ -32,25 +26,32 @@ function filtered_products($request) {
     foreach($products as $product ) {
 
         $attrs = $product->get_attributes();
+
+        $has_needed_attr = count($tags) ? -1 : 0;
+
+        $product_attrs = [];
+
         
-        foreach( $attrs as  $attr) {
+
+        foreach($attrs as  $attr) {
             $tax_name = $attr->get_name();
             $options = get_the_terms($product->get_id(), $tax_name);
-            $arr = [];
-            $has_needed_attr = -1;
-
-
-
             foreach($options as $option) {
-                if(in_array($option->name, $tags )) {
-                    $has_needed_attr = 1;
-                }
+                array_push($product_attrs, $option->name);
             }
-            
-            
-            if($has_needed_attr === 1 ) {
-                
-                
+        }
+        
+        $has_tags = count(array_intersect( $tags, $product_attrs)) == count($tags);
+        
+        if (!$has_tags)  continue;
+
+
+            foreach( $attrs as  $attr) {
+
+                $tax_name = $attr->get_name();
+                $options = get_the_terms($product->get_id(), $tax_name);
+                $arr = [];
+                    
                 // Check if we have filter added
                 $tax_index = -1;
 
@@ -82,10 +83,7 @@ function filtered_products($request) {
                 }
 
             }
-
-
-
-        }
+        
 
 
 
@@ -146,7 +144,6 @@ function get_category_products($request) {
     );
     $products = wc_get_products($args);
 
-    $product_html = '';
     $filters = [];
 
     $index = 0;
@@ -191,41 +188,15 @@ function get_category_products($request) {
             }
         }
 
-        
-        if ( $index <= 10 ) {
-            $product_html .= 
-            '<li class="product type-product">
-                <div class="post_item post_layout_list">
-                    <div class="post_featured hover_none">
-                    <a href="'.$product->get_permalink().'">
-                        '.$product->get_image( 'woocommerce_thumbnail', array(), true ).'
-                    </a>
-                    </div>
-                    <div class="post_data">
-                    <div class="post_data_inner">
-                        <div class="post_header entry-header">
-                        <h2 class="woocommerce-loop-product__title"><a href="'.$product->get_permalink().'">'.$product->get_title().'</a></h2>
-                        <div class="star-rating" role="img" aria-label="Įvertinimas: 4.83 iš 5">
-                            <span style="width: 96.6%">Įvertinimas: <strong class="rating">4.83</strong> iš 5</span>
-                        </div>
-                        </div>
-                        <div class="post_content entry-content"></div>
-                        '.$product->get_price_html().'
-                    </div>
-                    </div>
-                </div>
-            </li>';
-        }
-
         $index++;
     }
 
 
-	if (empty($product_html)) {
+	if (empty($filters)) {
 		return new WP_Error( 'empty_category', 'There are no posts to display', array('status' => 404) );
 	}
 	
-	$response = new WP_REST_Response(['products' =>  $product_html, 'filters' => $filters, 'qty' => $index]);
+	$response = new WP_REST_Response(['filters' => $filters, 'qty' => $index]);
 	$response->set_status(200);
 	return $response;
 }
@@ -235,6 +206,7 @@ function get_category_products($request) {
 
 
 function before_shop_loop() {
+
 
     ?>
     <button class="open-products-filter wp-block-button__link" data-category="<?php echo single_term_title(); ?>">
