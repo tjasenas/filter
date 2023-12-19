@@ -49,9 +49,7 @@ if (btnOpenModal) {
   const buttonsWrapper = document.querySelector(".btn-wrapper");
   buttonsWrapper.classList.add("hidden");
 
-  let tags = [
-    { slug: activeTags.dataset.page, name: activeTags.dataset.title },
-  ];
+  let tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
 
   let postType = activeTags.dataset.postType;
   let posts = [];
@@ -128,9 +126,7 @@ if (btnOpenModal) {
 
       console.log(filterSlug);
 
-      const getFilter = data.find(
-        (filter) => filter["parent-slug"] === filterSlug
-      );
+      const getFilter = data.find((filter) => filter["parent-slug"] === filterSlug);
 
       getFilter.childrens.forEach((child) => {
         if (child.childrens.length > 0) {
@@ -143,10 +139,7 @@ if (btnOpenModal) {
             if (isChecked(childElement.slug)) isOpen = true;
 
             if (childElement.has_posts !== 0) {
-              childHtml += listElement(
-                childElement,
-                isChecked(childElement.slug)
-              );
+              childHtml += listElement(childElement, isChecked(childElement.slug));
             }
           });
 
@@ -158,8 +151,7 @@ if (btnOpenModal) {
         } else {
           postsQty += child.has_posts;
           if (isChecked(child.slug)) isOpen = true;
-          if (child.has_posts !== 0)
-            html += listElement(child, isChecked(child.slug));
+          if (child.has_posts !== 0) html += listElement(child, isChecked(child.slug));
         }
       });
 
@@ -270,13 +262,10 @@ if (btnOpenModal) {
         startFrom: 0,
       };
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -351,9 +340,7 @@ if (btnOpenModal) {
     const target = e.target;
 
     if (target.classList.contains("remove-all")) {
-      tags = [
-        { slug: activeTags.dataset.page, name: activeTags.dataset.title },
-      ];
+      tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
       activeTags.classList.add("hidden");
       activeTags.innerHTML = `<li class="remove-all">Isvalyti filtrus</li>`;
 
@@ -450,13 +437,10 @@ if (btnOpenModal) {
         startFrom,
       };
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/getMore/posts`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMore/posts`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -534,12 +518,8 @@ function displayUserPosts(posts) {
                       </div> 
                   </div>
                   <div class="post_meta">
-                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${
-                    e.likes
-                  }</span></span>
-                  <a href="${
-                    e.url
-                  }"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
+                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${e.likes}</span></span>
+                  <a href="${e.url}"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
                     <span class="post_meta_number">${e.comments}</span>
                     <span class="post_meta_label">Comments</span>
                   </a>
@@ -572,13 +552,10 @@ if (getMore) {
 
       console.log(ar);
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -600,6 +577,35 @@ if (getMore) {
       console.log(err);
     }
   });
+}
+
+function price(priceObj) {
+  return `
+ <div class="drop-down">
+     <div class="drop-down__heading">
+     <h4>${priceObj.name}</h4>
+     </div>
+     <div class="filters-list" >
+       <div class="price-input">
+         <div class="field">
+           <span>Min</span>
+           <input type="number" class="input-min" value="${priceObj.lowest_price}">
+         </div>
+         <div class="separator">-</div>
+         <div class="field">
+           <span>Maks</span>
+           <input type="number" class="input-max" value="${priceObj.hight_price}">
+         </div>
+       </div>
+       <div class="slider">
+         <div class="progress"></div>
+       </div>
+       <div class="range-input">
+         <input type="range" class="range-min" min="${priceObj.lowest_price}" max="${priceObj.hight_price}" value="${priceObj.lowest_price}" step="1">
+         <input type="range" class="range-max" min="${priceObj.lowest_price}" max="${priceObj.hight_price}" value="${priceObj.hight_price}" step="1">
+       </div>
+     </div>
+ </div>`;
 }
 
 // const openFilterModal = document.querySelector(".open-products-filter");
@@ -655,33 +661,6 @@ btnCloseModal.addEventListener("click", closeModal);
 function filters(data) {
   let html = "";
 
-  html += `
-  <div class="drop-down">
-      <div class="drop-down__heading">
-      <h4>Kaina</h4>
-      </div>
-      <div class="filters-list" >
-        <div class="price-input">
-          <div class="field">
-            <span>Min</span>
-            <input type="number" class="input-min" value="2500">
-          </div>
-          <div class="separator">-</div>
-          <div class="field">
-            <span>Max</span>
-            <input type="number" class="input-max" value="7500">
-          </div>
-        </div>
-        <div class="slider">
-          <div class="progress"></div>
-        </div>
-        <div class="range-input">
-          <input type="range" class="range-min" min="1" max="1000" value="1" step="1">
-          <input type="range" class="range-max" min="1" max="1000" value="1000" step="1">
-        </div>
-      </div>
-  </div>`;
-
   let allProducts = 0;
 
   data.forEach((e) => {
@@ -689,16 +668,17 @@ function filters(data) {
     let isOpen = false;
     let i = 0;
 
+    if (e.name === "Kaina") {
+      html += price(e);
+      return;
+    }
+
     e.attr.forEach((item) => {
       hasActiveTag = tags.find((e) => e.tag === item.title);
       if (hasActiveTag) isOpen = true;
 
       listElement += `<li>
-        <input class="tag" data-filter="${e.name}" id="tag-${
-        item.title
-      }" data-tax="${item.title}"  type="checkbox" ${
-        hasActiveTag ? "checked" : ""
-      }>
+        <input class="tag" data-filter="${e.name}" id="tag-${item.title}" data-tax="${item.title}"  type="checkbox" ${hasActiveTag ? "checked" : ""}>
         <label for="tag-${item.title}">
           ${item.title}<span class="has-posts">${item.qty}</span>
         </label>
@@ -737,6 +717,7 @@ function filters(data) {
   let priceGap = 0;
 
   priceInput.forEach((input) => {
+    let myTimeout = "";
     input.addEventListener("input", (e) => {
       let minPrice = parseInt(priceInput[0].value),
         maxPrice = parseInt(priceInput[1].value);
@@ -744,16 +725,35 @@ function filters(data) {
       if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
         if (e.target.className === "input-min") {
           rangeInput[0].value = minPrice;
-          range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
+          // range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
         } else {
           rangeInput[1].value = maxPrice;
-          range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+          // range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
         }
       }
+
+      if (minPrice > maxPrice) return;
+      if (minPrice < 0 || isNaN(minPrice)) return;
+
+      const tagIndex = tags.findIndex((e) => e.parent === "kaina");
+      if (tagIndex !== -1) {
+        tags[tagIndex].tag = minPrice + "-" + maxPrice;
+      } else {
+        tags.push({ tag: minPrice + "-" + maxPrice, parent: "kaina" });
+      }
+
+      const searchParams = new URLSearchParams("");
+      tags.forEach((e) => searchParams.append(e.parent, e.tag));
+      const par = window.location.pathname + "?" + searchParams.toString();
+      history.pushState(null, "", par);
+
+      clearTimeout(myTimeout);
+      myTimeout = setTimeout(() => getFilteredProducts(), 1000);
     });
   });
 
   rangeInput.forEach((input) => {
+    let myTimeout = "";
     input.addEventListener("input", (e) => {
       let minVal = parseInt(rangeInput[0].value),
         maxVal = parseInt(rangeInput[1].value);
@@ -767,9 +767,27 @@ function filters(data) {
       } else {
         priceInput[0].value = minVal;
         priceInput[1].value = maxVal;
-        range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
-        range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+        // range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
+        // range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
       }
+
+      if (minVal > maxVal) return;
+      if (minVal < 0 || isNaN(minVal)) return;
+
+      const tagIndex = tags.findIndex((e) => e.parent === "kaina");
+      if (tagIndex !== -1) {
+        tags[tagIndex].tag = minVal + "-" + maxVal;
+      } else {
+        tags.push({ tag: minVal + "-" + maxVal, parent: "kaina" });
+      }
+
+      const searchParams = new URLSearchParams("");
+      tags.forEach((e) => searchParams.append(e.parent, e.tag));
+      const par = window.location.pathname + "?" + searchParams.toString();
+      history.pushState(null, "", par);
+
+      clearTimeout(myTimeout);
+      myTimeout = setTimeout(() => getFilteredProducts(), 1000);
     });
   });
 }
@@ -777,9 +795,7 @@ function filters(data) {
 async function fetchFilter() {
   try {
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(
-      `https://localhost/shop/wp-json/category/products/v1/accessories`
-    );
+    const response = await fetch(`https://localhost/shop/wp-json/category/products/v1/accessories`);
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -807,13 +823,10 @@ clearFilters.addEventListener("click", function () {
 async function getFilteredProducts() {
   try {
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(
-      `https://localhost/shop/wp-json/product/filter/v1/filter`,
-      {
-        method: "POST",
-        body: JSON.stringify({ tags }),
-      }
-    );
+    const response = await fetch(`http://localhost/shop/wp-json/product/filter/v1/filter`, {
+      method: "POST",
+      body: JSON.stringify({ tags }),
+    });
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");

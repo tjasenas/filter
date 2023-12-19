@@ -515,10 +515,11 @@ input[type="number"]::-webkit-inner-spin-button {
   right: 0%;
   position: absolute;
   border-radius: 5px;
-  background: #17a2b8;
+  /* background: #17a2b8; */
 }
 .range-input {
   position: relative;
+  margin-bottom: 2rem;
 }
 .range-input input {
   position: absolute;
@@ -548,29 +549,4 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: auto;
   -moz-appearance: none;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
-}
-/* Support */
-.support-box {
-  top: 2rem;
-  position: relative;
-  bottom: 0;
-  text-align: center;
-  display: block;
-}
-.b-btn {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
-.b-btn.paypal i {
-  color: blue;
-}
-.b-btn:hover {
-  text-decoration: none;
-  font-weight: bold;
-}
-.b-btn i {
-  font-size: 20px;
-  color: yellow;
-  margin-top: 2rem;
 }

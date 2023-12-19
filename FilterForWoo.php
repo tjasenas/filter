@@ -18,9 +18,12 @@ function filtered_products($request) {
     $products = wc_get_products($args);
 
     $product_html = '';
-    $filters = [];
+    $filters = [['name'=>'Kaina', 'lowest_price' => 10000, 'hight_price' => 0 ]];
 
     $index = 0;
+
+    // array_push($arr['attr'], ['title' => $option->name, 'qty' => 1]); 
+
 
 
     foreach($products as $product ) {
@@ -31,6 +34,14 @@ function filtered_products($request) {
 
         $product_attrs = [];
 
+        // $price = $product->get_price();
+
+        // if( $price <  $filters[0]['lowest_price']) {
+        //     $filters[0]['lowest_price'] = $price;
+        // }
+        // if( $price > $filters[0]['hight_price']) {
+        //     $filters[0]['hight_price'] = $price;
+        // }
         
 
         foreach($attrs as  $attr) {
@@ -144,11 +155,22 @@ function get_category_products($request) {
     );
     $products = wc_get_products($args);
 
-    $filters = [];
+    $filters = [['name'=>'Kaina', 'lowest_price' => 10000, 'hight_price' => 0 ]];
 
     $index = 0;
 
     foreach($products as $product ) {
+
+        $price = $product->get_price();
+
+        if( $price <  $filters[0]['lowest_price']) {
+            $filters[0]['lowest_price'] = $price;
+        }
+        if( $price > $filters[0]['hight_price']) {
+            $filters[0]['hight_price'] = $price;
+        }
+
+
 
         $attrs = $product->get_attributes();
         
