@@ -770,6 +770,10 @@ add_action('rest_api_init', function () {
 		'methods'  => 'GET',
 		'callback' => 'get_category_products'
 	));
+	register_rest_route( 'category/reset/v1', '(?P<category>[a-zA-Z0-9-]+)',array(
+		'methods'  => 'GET',
+		'callback' => 'get_category_with_cleared_filters'
+	));
 	register_rest_route( 'product/filter/v1', '(?P<filter>[a-zA-Z0-9-]+)',array(
 		'methods'  => 'POST',
 		'callback' => 'filtered_products'

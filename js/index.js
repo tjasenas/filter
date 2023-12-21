@@ -49,7 +49,9 @@ if (btnOpenModal) {
   const buttonsWrapper = document.querySelector(".btn-wrapper");
   buttonsWrapper.classList.add("hidden");
 
-  let tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
+  let tags = [
+    { slug: activeTags.dataset.page, name: activeTags.dataset.title },
+  ];
 
   let postType = activeTags.dataset.postType;
   let posts = [];
@@ -126,7 +128,9 @@ if (btnOpenModal) {
 
       console.log(filterSlug);
 
-      const getFilter = data.find((filter) => filter["parent-slug"] === filterSlug);
+      const getFilter = data.find(
+        (filter) => filter["parent-slug"] === filterSlug
+      );
 
       getFilter.childrens.forEach((child) => {
         if (child.childrens.length > 0) {
@@ -139,7 +143,10 @@ if (btnOpenModal) {
             if (isChecked(childElement.slug)) isOpen = true;
 
             if (childElement.has_posts !== 0) {
-              childHtml += listElement(childElement, isChecked(childElement.slug));
+              childHtml += listElement(
+                childElement,
+                isChecked(childElement.slug)
+              );
             }
           });
 
@@ -151,7 +158,8 @@ if (btnOpenModal) {
         } else {
           postsQty += child.has_posts;
           if (isChecked(child.slug)) isOpen = true;
-          if (child.has_posts !== 0) html += listElement(child, isChecked(child.slug));
+          if (child.has_posts !== 0)
+            html += listElement(child, isChecked(child.slug));
         }
       });
 
@@ -262,10 +270,13 @@ if (btnOpenModal) {
         startFrom: 0,
       };
 
-      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`, {
-        method: "POST",
-        body: JSON.stringify(ar),
-      });
+      const data = await fetch(
+        `https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`,
+        {
+          method: "POST",
+          body: JSON.stringify(ar),
+        }
+      );
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -340,7 +351,9 @@ if (btnOpenModal) {
     const target = e.target;
 
     if (target.classList.contains("remove-all")) {
-      tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
+      tags = [
+        { slug: activeTags.dataset.page, name: activeTags.dataset.title },
+      ];
       activeTags.classList.add("hidden");
       activeTags.innerHTML = `<li class="remove-all">Isvalyti filtrus</li>`;
 
@@ -437,10 +450,13 @@ if (btnOpenModal) {
         startFrom,
       };
 
-      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMore/posts`, {
-        method: "POST",
-        body: JSON.stringify(ar),
-      });
+      const data = await fetch(
+        `https://vivaldi.lt/wp-json/posts/v1/getMore/posts`,
+        {
+          method: "POST",
+          body: JSON.stringify(ar),
+        }
+      );
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -490,6 +506,9 @@ if (btnOpenModal) {
 
 const postsWrappers = document.querySelector(".ctx-posts");
 
+let highPrice = 0;
+let lowestPrice = 0;
+
 function displayUserPosts(posts) {
   let html = "";
   posts.forEach((e) => {
@@ -518,8 +537,12 @@ function displayUserPosts(posts) {
                       </div> 
                   </div>
                   <div class="post_meta">
-                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${e.likes}</span></span>
-                  <a href="${e.url}"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
+                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${
+                    e.likes
+                  }</span></span>
+                  <a href="${
+                    e.url
+                  }"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
                     <span class="post_meta_number">${e.comments}</span>
                     <span class="post_meta_label">Comments</span>
                   </a>
@@ -552,10 +575,13 @@ if (getMore) {
 
       console.log(ar);
 
-      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`, {
-        method: "POST",
-        body: JSON.stringify(ar),
-      });
+      const data = await fetch(
+        `https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`,
+        {
+          method: "POST",
+          body: JSON.stringify(ar),
+        }
+      );
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -580,6 +606,7 @@ if (getMore) {
 }
 
 function price(priceObj) {
+  console.log(priceObj);
   return `
  <div class="drop-down">
      <div class="drop-down__heading">
@@ -601,8 +628,8 @@ function price(priceObj) {
          <div class="progress"></div>
        </div>
        <div class="range-input">
-         <input type="range" class="range-min" min="${priceObj.lowest_price}" max="${priceObj.hight_price}" value="${priceObj.lowest_price}" step="1">
-         <input type="range" class="range-max" min="${priceObj.lowest_price}" max="${priceObj.hight_price}" value="${priceObj.hight_price}" step="1">
+         <input type="range" class="range-min" min="${priceObj.startLowest}" max="${priceObj.startHights}" value="${priceObj.lowest_price}" step="1">
+         <input type="range" class="range-max" min="${priceObj.startLowest}" max="${priceObj.startHights}" value="${priceObj.hight_price}" step="1">
        </div>
      </div>
  </div>`;
@@ -615,8 +642,10 @@ const modal = document.querySelector(".modal");
 const overlay = document.querySelector(".overlay");
 const btnCloseModal = document.querySelector(".close-modal");
 const filterBtn = document.querySelector(".filter-btn");
-let init = false;
+const filterBlock = document.querySelector(".posts_sorting");
+const tagsWrapper = document.querySelector(".active-tags");
 
+let init = false;
 let tags = [];
 
 const openModal = function () {
@@ -637,7 +666,16 @@ openFilterBtn.addEventListener("click", function () {
 
   openModal();
 });
-filterBtn.addEventListener("click", closeModal);
+filterBtn.addEventListener("click", function () {
+  tagsWrapper.classList.remove("hidden");
+  const newTags = tags.map((e) => {
+    return `<li>${e.tag}<span class="remove-tag" data-name="225-490">X</span></li>`;
+  });
+
+  tagsWrapper.insertAdjacentHTML("afterbegin", newTags.join(""));
+
+  closeModal();
+});
 btnCloseModal.addEventListener("click", closeModal);
 overlay.addEventListener("click", closeModal);
 
@@ -659,7 +697,13 @@ const spinnerWrapper = document.querySelector(".spinner-wrapper");
 btnCloseModal.addEventListener("click", closeModal);
 
 function filters(data) {
-  let html = "";
+  let html = price({
+    name: "Kaina",
+    lowest_price: lowestPrice,
+    hight_price: highPrice,
+    startLowest: lowestPrice,
+    startHights: highPrice,
+  });
 
   let allProducts = 0;
 
@@ -669,7 +713,8 @@ function filters(data) {
     let i = 0;
 
     if (e.name === "Kaina") {
-      html += price(e);
+      // console.log({ ...e, startLowest: lowestPrice, startHights: highPrice });
+      html = price({ ...e, startLowest: lowestPrice, startHights: highPrice });
       return;
     }
 
@@ -678,19 +723,24 @@ function filters(data) {
       if (hasActiveTag) isOpen = true;
 
       listElement += `<li>
-        <input class="tag" data-filter="${e.name}" id="tag-${item.title}" data-tax="${item.title}"  type="checkbox" ${hasActiveTag ? "checked" : ""}>
+        <input class="tag" data-filter="${e.name}" id="tag-${
+        item.title
+      }" data-tax="${item.title}"  type="checkbox" ${
+        hasActiveTag ? "checked" : ""
+      }>
         <label for="tag-${item.title}">
           ${item.title}<span class="has-posts">${item.qty}</span>
         </label>
       </li>`;
-      allProducts += +item.qty;
-      i++;
     });
+
+    const str = e.name.slice(3).split("-");
+    const title = str[0][0].toUpperCase() + str[0].slice(1);
 
     html += `
     <div class="drop-down">
         <div class="drop-down__heading">
-        <h4>${e.name} (${i})</h4>
+        <h4>${title}</h4>
         </div>
         <ul class="filters-list" style="${isOpen ? "display:block" : ""}" id="">
           ${listElement}
@@ -698,7 +748,6 @@ function filters(data) {
     </div>`;
   });
 
-  filterBtn.querySelector(".btn-qty").textContent = allProducts;
   filtersWrapper.innerHTML = html;
 
   jQuery(function ($) {
@@ -795,7 +844,9 @@ function filters(data) {
 async function fetchFilter() {
   try {
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(`https://localhost/shop/wp-json/category/products/v1/accessories`);
+    const response = await fetch(
+      `https://localhost/shop/wp-json/category/products/v1/accessories`
+    );
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -803,41 +854,81 @@ async function fetchFilter() {
 
     const data = await response.json();
 
-    // console.log(data);
+    lowestPrice = data.lowest_price;
+    highPrice = data.high_price;
 
     filters(data.filters);
+    filterBtn.querySelector(".btn-qty").textContent = data.qty;
     spinnerWrapper.classList.add("hidden");
   } catch (err) {
     console.log(err);
   }
 }
 
-clearFilters.addEventListener("click", function () {
-  if (!tags.length) return;
-  tags = [];
-  //Get filtered products
-  getFilteredProducts();
-  history.pushState(null, "", window.location.pathname);
-});
-
-async function getFilteredProducts() {
+clearFilters.addEventListener("click", async function () {
   try {
+    if (!tags.length) return;
+    tags = [];
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(`http://localhost/shop/wp-json/product/filter/v1/filter`, {
-      method: "POST",
-      body: JSON.stringify({ tags }),
-    });
+    history.pushState(null, "", window.location.pathname);
+    const response = await fetch(
+      `http://localhost/shop/wp-json/category/reset/v1/accessories`
+    );
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
     }
 
     const data = await response.json();
-    filters(data.filters);
+    filters(data.filters, data.qty);
     productsWrapper.innerHTML = data.products;
+    filterBtn.querySelector(".btn-qty").textContent = data.qty;
     spinnerWrapper.classList.add("hidden");
   } catch (err) {
     console.log(err);
+  }
+
+  // if (!tags.length) return;
+
+  // tags = [];
+  // //Get filtered products
+  // getFilteredProducts();
+  // history.pushState(null, "", window.location.pathname);
+});
+
+async function getFilteredProducts() {
+  try {
+    spinnerWrapper.classList.remove("hidden");
+    const response = await fetch(
+      `http://localhost/shop/wp-json/product/filter/v1/accessories`,
+      {
+        method: "POST",
+        body: JSON.stringify({ tags: tags }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Serverio klaida. Prašome pamėginti veliau.");
+    }
+
+    const data = await response.json();
+    if (data.code === "empty_category") {
+      filtersWrapper.innerHTML = `<p>${data.message}</p>`;
+      filterBtn.querySelector(".btn-qty").textContent = 0;
+      spinnerWrapper.classList.add("hidden");
+      return;
+    }
+
+    filters(data.filters, data.qty);
+    productsWrapper.innerHTML = data.products;
+    filterBtn.querySelector(".btn-qty").textContent = data.qty;
+    spinnerWrapper.classList.add("hidden");
+  } catch (err) {
+    console.log(err);
+    filtersWrapper.innerHTML = `<p>${err.message}</p>`;
+    spinnerWrapper.classList.add("hidden");
+    filterBtn.querySelector(".btn-qty").textContent = 0;
+    productsWrapper.innerHTML = `<p>${err.message}</p>`;
   }
 }
 
@@ -865,3 +956,21 @@ filtersWrapper.addEventListener("click", function (e) {
     history.pushState(null, "", par);
   }
 });
+
+tagsWrapper.addEventListener("click", function (e) {
+  const target = e.target;
+
+  const isRemoveAll = target.classList.contains("remove-all");
+  if (isRemoveAll) {
+    tags = [];
+    this.classList.add("hidden");
+    this.innerHTML = '<li class="remove-all">Išvalyti filtrus</li>';
+    history.pushState(null, "", window.location.pathname);
+  }
+});
+
+function addFilters() {
+  let html = "";
+
+  tags.forEach((tag) => {});
+}
