@@ -572,3 +572,14 @@ input[type="range"]::-moz-range-thumb {
 .category-sorting .active-tags {
   margin-bottom: 0 !important;
 }
+.products.loading {
+  position: relative;
+}
+.products.loading::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+}

@@ -49,9 +49,7 @@ if (btnOpenModal) {
   const buttonsWrapper = document.querySelector(".btn-wrapper");
   buttonsWrapper.classList.add("hidden");
 
-  let tags = [
-    { slug: activeTags.dataset.page, name: activeTags.dataset.title },
-  ];
+  let tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
 
   let postType = activeTags.dataset.postType;
   let posts = [];
@@ -128,9 +126,7 @@ if (btnOpenModal) {
 
       console.log(filterSlug);
 
-      const getFilter = data.find(
-        (filter) => filter["parent-slug"] === filterSlug
-      );
+      const getFilter = data.find((filter) => filter["parent-slug"] === filterSlug);
 
       getFilter.childrens.forEach((child) => {
         if (child.childrens.length > 0) {
@@ -143,10 +139,7 @@ if (btnOpenModal) {
             if (isChecked(childElement.slug)) isOpen = true;
 
             if (childElement.has_posts !== 0) {
-              childHtml += listElement(
-                childElement,
-                isChecked(childElement.slug)
-              );
+              childHtml += listElement(childElement, isChecked(childElement.slug));
             }
           });
 
@@ -158,8 +151,7 @@ if (btnOpenModal) {
         } else {
           postsQty += child.has_posts;
           if (isChecked(child.slug)) isOpen = true;
-          if (child.has_posts !== 0)
-            html += listElement(child, isChecked(child.slug));
+          if (child.has_posts !== 0) html += listElement(child, isChecked(child.slug));
         }
       });
 
@@ -270,13 +262,10 @@ if (btnOpenModal) {
         startFrom: 0,
       };
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/sortBy/filter`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -351,9 +340,7 @@ if (btnOpenModal) {
     const target = e.target;
 
     if (target.classList.contains("remove-all")) {
-      tags = [
-        { slug: activeTags.dataset.page, name: activeTags.dataset.title },
-      ];
+      tags = [{ slug: activeTags.dataset.page, name: activeTags.dataset.title }];
       activeTags.classList.add("hidden");
       activeTags.innerHTML = `<li class="remove-all">Isvalyti filtrus</li>`;
 
@@ -450,13 +437,10 @@ if (btnOpenModal) {
         startFrom,
       };
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/getMore/posts`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMore/posts`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -537,12 +521,8 @@ function displayUserPosts(posts) {
                       </div> 
                   </div>
                   <div class="post_meta">
-                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${
-                    e.likes
-                  }</span></span>
-                  <a href="${
-                    e.url
-                  }"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
+                  <span class="post_meta_item post_meta_likes trx_addons_icon-heart-empty"><span class="post_meta_number">${e.likes}</span></span>
+                  <a href="${e.url}"#comments" class="post_meta_item post_meta_comments icon-comment-light inited">
                     <span class="post_meta_number">${e.comments}</span>
                     <span class="post_meta_label">Comments</span>
                   </a>
@@ -575,13 +555,10 @@ if (getMore) {
 
       console.log(ar);
 
-      const data = await fetch(
-        `https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`,
-        {
-          method: "POST",
-          body: JSON.stringify(ar),
-        }
-      );
+      const data = await fetch(`https://vivaldi.lt/wp-json/posts/v1/getMoreUserPosts/posts`, {
+        method: "POST",
+        body: JSON.stringify(ar),
+      });
 
       if (!data.ok) {
         throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -648,6 +625,15 @@ const tagsWrapper = document.querySelector(".active-tags");
 let init = false;
 let tags = [];
 
+const queryString = window.location.search;
+if (queryString) {
+  const urlParams = new URLSearchParams(queryString);
+  urlParams.forEach((value, key) => {
+    tags.push({ id: Date.now(), tag: value, parent: key });
+  });
+}
+console.log(tags);
+
 const openModal = function () {
   modal.classList.remove("hidden");
   overlay.classList.remove("hidden");
@@ -660,20 +646,11 @@ const closeModal = function () {
 
 openFilterBtn.addEventListener("click", function () {
   if (!init) {
-    fetchFilter();
-    init = true;
+    tags.length ? getFilteredProducts() : fetchFilter();
   }
-
   openModal();
 });
 filterBtn.addEventListener("click", function () {
-  tagsWrapper.classList.remove("hidden");
-  const newTags = tags.map((e) => {
-    return `<li>${e.tag}<span class="remove-tag" data-name="225-490">X</span></li>`;
-  });
-
-  tagsWrapper.insertAdjacentHTML("afterbegin", newTags.join(""));
-
   closeModal();
 });
 btnCloseModal.addEventListener("click", closeModal);
@@ -686,6 +663,15 @@ document.addEventListener("keydown", function (event) {
     closeModal();
   }
 });
+
+function fixText(text) {
+  if (text.includes("pa_")) {
+    const str = text.slice(3).split("-").join(" ");
+    console.log(str);
+    return str[0].toUpperCase() + str.slice(1);
+  }
+  return text[0].toUpperCase() + text.slice(1);
+}
 
 const pageTitle = document.querySelector(".page-title");
 const productsWrapper = document.querySelector(".products");
@@ -723,24 +709,17 @@ function filters(data) {
       if (hasActiveTag) isOpen = true;
 
       listElement += `<li>
-        <input class="tag" data-filter="${e.name}" id="tag-${
-        item.title
-      }" data-tax="${item.title}"  type="checkbox" ${
-        hasActiveTag ? "checked" : ""
-      }>
+        <input class="tag" data-filter="${e.name}" id="tag-${item.title}" data-tax="${item.title}"  type="checkbox" ${hasActiveTag ? "checked" : ""}>
         <label for="tag-${item.title}">
           ${item.title}<span class="has-posts">${item.qty}</span>
         </label>
       </li>`;
     });
 
-    const str = e.name.slice(3).split("-");
-    const title = str[0][0].toUpperCase() + str[0].slice(1);
-
     html += `
     <div class="drop-down">
         <div class="drop-down__heading">
-        <h4>${title}</h4>
+        <h4>${fixText(e.name)}</h4>
         </div>
         <ul class="filters-list" style="${isOpen ? "display:block" : ""}" id="">
           ${listElement}
@@ -788,7 +767,7 @@ function filters(data) {
       if (tagIndex !== -1) {
         tags[tagIndex].tag = minPrice + "-" + maxPrice;
       } else {
-        tags.push({ tag: minPrice + "-" + maxPrice, parent: "kaina" });
+        tags.push({ id: Date.now(), tag: minPrice + "-" + maxPrice, parent: "kaina" });
       }
 
       const searchParams = new URLSearchParams("");
@@ -827,7 +806,7 @@ function filters(data) {
       if (tagIndex !== -1) {
         tags[tagIndex].tag = minVal + "-" + maxVal;
       } else {
-        tags.push({ tag: minVal + "-" + maxVal, parent: "kaina" });
+        tags.push({ id: Date.now(), tag: minVal + "-" + maxVal, parent: "kaina" });
       }
 
       const searchParams = new URLSearchParams("");
@@ -844,9 +823,7 @@ function filters(data) {
 async function fetchFilter() {
   try {
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(
-      `https://localhost/shop/wp-json/category/products/v1/accessories`
-    );
+    const response = await fetch(`https://localhost/shop/wp-json/category/products/v1/accessories`);
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -860,6 +837,7 @@ async function fetchFilter() {
     filters(data.filters);
     filterBtn.querySelector(".btn-qty").textContent = data.qty;
     spinnerWrapper.classList.add("hidden");
+    init = true;
   } catch (err) {
     console.log(err);
   }
@@ -871,9 +849,7 @@ clearFilters.addEventListener("click", async function () {
     tags = [];
     spinnerWrapper.classList.remove("hidden");
     history.pushState(null, "", window.location.pathname);
-    const response = await fetch(
-      `http://localhost/shop/wp-json/category/reset/v1/accessories`
-    );
+    const response = await fetch(`http://localhost/shop/wp-json/category/reset/v1/accessories`);
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -884,6 +860,7 @@ clearFilters.addEventListener("click", async function () {
     productsWrapper.innerHTML = data.products;
     filterBtn.querySelector(".btn-qty").textContent = data.qty;
     spinnerWrapper.classList.add("hidden");
+    addFilters();
   } catch (err) {
     console.log(err);
   }
@@ -899,13 +876,15 @@ clearFilters.addEventListener("click", async function () {
 async function getFilteredProducts() {
   try {
     spinnerWrapper.classList.remove("hidden");
-    const response = await fetch(
-      `http://localhost/shop/wp-json/product/filter/v1/accessories`,
-      {
-        method: "POST",
-        body: JSON.stringify({ tags: tags }),
-      }
-    );
+    productsWrapper.classList.add("loading");
+
+    const findObj = tags.find((e) => e.parent === "kaina");
+    const sendTags = findObj ? tags : [...tags, { tag: lowestPrice + "-" + highPrice, parent: "kaina" }];
+
+    const response = await fetch(`http://localhost/shop/wp-json/product/filter/v1/accessories`, {
+      method: "POST",
+      body: JSON.stringify({ tags: sendTags }),
+    });
 
     if (!response.ok) {
       throw new Error("Serverio klaida. Prašome pamėginti veliau.");
@@ -923,12 +902,18 @@ async function getFilteredProducts() {
     productsWrapper.innerHTML = data.products;
     filterBtn.querySelector(".btn-qty").textContent = data.qty;
     spinnerWrapper.classList.add("hidden");
+    productsWrapper.classList.remove("loading");
+    init = true;
+    addFilters();
+
+    console.log(tags);
   } catch (err) {
     console.log(err);
     filtersWrapper.innerHTML = `<p>${err.message}</p>`;
     spinnerWrapper.classList.add("hidden");
     filterBtn.querySelector(".btn-qty").textContent = 0;
     productsWrapper.innerHTML = `<p>${err.message}</p>`;
+    productsWrapper.classList.remove("loading");
   }
 }
 
@@ -943,7 +928,7 @@ filtersWrapper.addEventListener("click", function (e) {
     if (hasTag) {
       tags = tags.filter((tag) => tag.tag !== target.dataset.tax);
     } else {
-      tags.push({ tag: target.dataset.tax, parent: target.dataset.filter });
+      tags.push({ id: Date.now(), tag: target.dataset.tax, parent: target.dataset.filter });
     }
 
     //Get filtered products
@@ -963,14 +948,28 @@ tagsWrapper.addEventListener("click", function (e) {
   const isRemoveAll = target.classList.contains("remove-all");
   if (isRemoveAll) {
     tags = [];
-    this.classList.add("hidden");
-    this.innerHTML = '<li class="remove-all">Išvalyti filtrus</li>';
     history.pushState(null, "", window.location.pathname);
+    getFilteredProducts();
+  }
+
+  const isRemoveTag = target.classList.contains("remove-tag");
+  if (isRemoveTag) {
+    tags = tags.filter((tag) => tag.id !== +target.dataset.id);
+    history.pushState(null, "", window.location.pathname);
+    getFilteredProducts();
   }
 });
 
 function addFilters() {
-  let html = "";
+  const newTags = tags.map((e) => {
+    return `<li>${fixText(e.parent)} - ${e.tag}<span class="remove-tag" data-id="${e.id}">X</span></li>`;
+  });
+  newTags.push('<li class="remove-all">Išvalyti filtrus</li>');
+  tagsWrapper.innerHTML = newTags.join("");
 
-  tags.forEach((tag) => {});
+  if (tags.length === 0) {
+    tagsWrapper.classList.add("hidden");
+  } else {
+    tagsWrapper.classList.remove("hidden");
+  }
 }

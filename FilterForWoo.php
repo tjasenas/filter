@@ -327,25 +327,34 @@ function get_category_with_cleared_filters($request) {
         }
 
         if ( $index <= 10 ) {
-            $product_html .= 
-            '<li class="product type-product">
-                <div class="post_item post_layout_list">
-                    <div class="post_featured hover_none">
-                    <a href="'.$product->get_permalink().'">
-                        '.$product->get_image( 'woocommerce_thumbnail', array(), true ).'
-                    </a>
+            $product_html .= '
+            <li class="product type-product post-'.$product->get_id().' status-publish first instock product_cat-accessories has-post-thumbnail taxable shipping-taxable purchasable product-type-simple without-images wishlist_decorated">
+                <div class="post_item post_layout_thumbs">
+
+                    <div class="post_featured hover_shop_buttons">
+                        <a href="'.$product->get_permalink().'">'.$product->get_image( 'woocommerce_thumbnail', array(), true ).'</a>
+                        <div class="mask"></div>
+                        
+                        <div class="icons">
+                            <a rel="nofollow" href="?add-to-cart='.$product->get_id().'" aria-hidden="true" data-quantity="1" data-product_id="14" data-product_sku="" class="shop_cart icon-cart-2 button add_to_cart_button product_type_simple product_in_stock ajax_add_to_cart">Buy now</a>
+                            <a href="'.$product->get_permalink().'" aria-hidden="true" class="shop_link button icon-link">
+                            Details
+                            </a>
+                        </div>
                     </div>
+
                     <div class="post_data">
-                    <div class="post_data_inner">
-                        <div class="post_header entry-header">
-                        <h2 class="woocommerce-loop-product__title"><a href="'.$product->get_permalink().'">'.$product->get_title().'</a></h2>
-                        <div class="star-rating" role="img" aria-label="Įvertinimas: 4.83 iš 5">
-                            <span style="width: 96.6%">Įvertinimas: <strong class="rating">4.83</strong> iš 5</span>
+                        <div class="post_data_inner">
+                            <div class="post_header entry-header">
+                                <h2 class="woocommerce-loop-product__title"><a href="'.$product->get_permalink().'">Krepselis</a></h2>			
+                            </div>
+                            <div class="price_wrap">
+                                <span class="price">
+                                '.$product->get_price_html().'
+                                </span>
+                            </div>
+                            <a href="?add-to-cart='.$product->get_id().'" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart sc_button_hover_slide_left" data-product_id="14" data-product_sku="" aria-label="Add “Krepselis” to your cart" aria-describedby="" rel="nofollow">Buy now</a>				
                         </div>
-                        </div>
-                        <div class="post_content entry-content"></div>
-                        '.$product->get_price_html().'
-                    </div>
                     </div>
                 </div>
             </li>';
@@ -383,30 +392,52 @@ function before_shop_loop() {
 
 
 	$url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-	$url_components = parse_url( $url, $component = -1 );
+	$url_components = parse_url( $url, PHP_URL_QUERY);
 
-    if(isset($url_components['query'])) {
-        parse_str($url_components['query'], $params);
-    }
+    // if(isset($url_components)) {
+    //     parse_str($url_components, $params);
+    // }
+
+
+
+        $params = [];
+
+        if(isset($url_components)) {
+            $raw_querys = explode("&" ,$url_components);
+            foreach($raw_querys as $query) {
+                $q = explode('=', $query);
+                array_push($params, $q);
+            }
+        }
+
+
 
         ?>
 
         <div class="category-sorting">
 
-        <ul class="active-tags category-tags <?php echo isset($url_components['query']) ? '' : 'hidden'; ?>" >
+        <ul class="active-tags category-tags <?php echo count($params) ? '' : 'hidden'; ?>" >
             <?php 
-            if(isset($url_components['query'])) :
-            foreach( $params as $key => $param ): 
+
+            if(count($params)) :
+            foreach( $params as  $param_arr ): 
+
+                $title = $param_arr[0];
+                
+                if(str_contains($title , 'pa_')) {
+                    $str = str_replace('pa_', '', $title);
+                    $explode = explode('-', $str);
+                    $title  = join(' ', $explode);
+                }
+
                 ?>
-                <li><?php echo $key; ?> - <?php echo $param; ?><span class="remove-tag" data-name="<?php echo $param; ?>" >X</span></li>
+                <li><?php echo $title; ?> - <?php echo $param_arr[1]; ?><span class="remove-tag" data-name="<?php echo $param; ?>" >X</span></li>
                 <?php
             endforeach; 
             endif;
             ?>
             <li class="remove-all">Išvalyti filtrus</li>
         </ul>
-
-     
 
             <button class="open-products-filter wp-block-button__link" data-filters="veiklos-regionai, privatus-objektai, viesos-erdves">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
