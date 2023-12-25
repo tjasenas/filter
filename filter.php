@@ -781,5 +781,22 @@ add_action('rest_api_init', function () {
 });
 
 
+add_filter( 'woocommerce_locate_template', 'intercept_wc_templates', 10, 3 );
+/**
+ * Filter the cart template path to use cart.php in this plugin instead of the one in WooCommerce.
+ *
+ * @param string $template      Default template file path.
+ * @param string $template_name Template file slug.
+ * @param string $template_path Template file name.
+ *
+ * @return string The new Template file path.
+ */
+function intercept_wc_templates( $template, $template_name, $template_path ) {
+
+	$template_directory = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'templates/';
+	$path = $template_directory . $template_name;
+
+	return file_exists( $path ) ? $path : $template;
+}
 
 
