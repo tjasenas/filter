@@ -81,36 +81,37 @@ function filtered_products($request) {
 
                 $tax_name = $attr->get_name();
                 $options = get_the_terms($product->get_id(), $tax_name);
-                $arr = [];
-                    
-                // Check if we have filter added
+                
+    
+    
                 $tax_index = -1;
-
+    
                 foreach($filters as $key => $item) {
                     if($item['name'] === $tax_name ) {
                         $tax_index = $key;
                     }
                 }
-
-                if( $tax_index !== -1 ) {
-                    // Increase attribute qty
-                    foreach($options as $option) {
-
-                        foreach($filters[$tax_index]['attr'] as $key => $tax) {
-                            if($tax['title'] === $option->name ) {
-                                $filters[$tax_index]['attr'][$key]['qty'] += 1;
-                            }
+    
+    
+                if($tax_index === -1) {
+                    array_push($filters, [ 'name' => $tax_name, 'attr' => [] ]);
+                    $tax_index = array_key_last($filters);
+                } 
+    
+                foreach($options as $option) {
+                    $tax_attr_index = -1;
+                    
+                    foreach($filters[$tax_index]['attr'] as $key => $item) {
+                        if($option->name === $item['title']) {
+                            $tax_attr_index = $key;
                         }
                     }
-
-                } else {
-                    //Add new tax and attributes
-                    $arr = [ 'name' => $tax_name, 'attr' => [] ];
-                    foreach($options as $option) {
-                        if( $option->name === Null) break;
-                        array_push($arr['attr'], ['title' => $option->name, 'qty' => 1]); 
+                
+                    if($tax_attr_index > -1) {
+                        $filters[$tax_index]['attr'][$tax_attr_index]['qty']++;
+                    } else {
+                        array_push($filters[$tax_index]['attr'], ['title' => $option->name, 'qty' => 1]);
                     }
-                    array_push($filters, $arr );
                 }
 
             }
@@ -189,7 +190,6 @@ function get_category_products($request) {
     $init = false;
 
     $filters = [];
-    $filterss = [];
     $index = 0;
 
     foreach($products as $product ) {
@@ -239,80 +239,21 @@ function get_category_products($request) {
                 $tax_index = array_key_last($filters);
             } 
 
-            $tax_attr_index = -1;
-
             foreach($options as $option) {
-
+                $tax_attr_index = -1;
+                
                 foreach($filters[$tax_index]['attr'] as $key => $item) {
                     if($option->name === $item['title']) {
                         $tax_attr_index = $key;
                     }
                 }
-
+            
+                if($tax_attr_index > -1) {
+                    $filters[$tax_index]['attr'][$tax_attr_index]['qty']++;
+                } else {
+                    array_push($filters[$tax_index]['attr'], ['title' => $option->name, 'qty' => 1]);
+                }
             }
-
-            if($tax_attr_index  !== -1) {
-                $filters[$tax_index]['attr'][$tax_attr_index] = 1;
-            } else {
-                array_push($filters[$tax_index]['attr'], ['title' => $option->name, 'qty' => 1]);
-            }
-
-
-            
-            // array_push($filterss,  $options );
-            
-            
-            // Check if we have filter added
-            
-            // foreach($filters as $key => $item) {
-            //     if($item['name'] === $tax_name ) {
-            //         $tax_index = $key;
-            //     } else {
-            //         foreach($filters as $key => $item) {
-            //             if($item['name'] === $tax_name ) {
-            //                 $tax_index = $key;
-            //             }
-            //         }
-            //     }
-            // }
-            
-            
-            // array_push($filters, [ 'name' => $tax_name, 'attr' => [] ]);
-
-
-            // if( $tax_index !== -1 ) {
-                // Increase attribute qty
-
-
-            // foreach($options as $option) {
-
-
-                // $option_index = $filters[$tax_name]['attr'][$option->name];
-
-                // if($option_index && $option_index > -1) {
-                //     $filters[$tax_index]['attr'][$option_index]['qty'] += 1;
-                // } else {
-                //    $filters[$tax_index]['attr'][$option->name] = ['title' => $option->name, 'qty' => 1];
-                // }
-            // }
-            
-            // foreach($filters[$tax_index]['attr'] as $key => $tax) {
-            //     if($tax['title'] === $option->name ) {
-            //         $filters[$tax_index]['attr'][$key]['qty'] += 1;
-            //     }
-            // }
-            
-
-            // }
-            // } else {
-            //     //Add new tax and attributes
-            //     $arr = [ 'name' => $tax_name, 'attr' => [] ];
-
-            //     foreach($options as $option) {
-            //         array_push($arr['attr'], ['title' => $option->name, 'qty' => 1]); 
-            //     }
-            //     array_push($filters, $arr );
-            // }
         }
 
         $index++;
@@ -497,6 +438,7 @@ function before_shop_loop() {
 			</button>
 		</div>
 		<?php
+
 }
 add_action('woocommerce_before_shop_loop', 'before_shop_loop', 10 );
 
